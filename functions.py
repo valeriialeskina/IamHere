@@ -41,6 +41,8 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.datasets import make_classification
 
+import matplotlib.pyplot as plt
+
 def clean_complete(tweet): #to be adjusted for the diary -- for now it is copypasted for tweets
     """
     tweet: pandas series
