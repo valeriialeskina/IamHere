@@ -41,6 +41,11 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.datasets import make_classification
 
+from nrclex import NRCLex
+import re
+from gensim.parsing.preprocessing import STOPWORDS, strip_numeric, strip_punctuation, strip_multiple_whitespaces, remove_stopwords, strip_short
+import en_core_web_sm
+from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 
 def clean_complete(tweet): #to be adjusted for the diary -- for now it is copypasted for tweets
@@ -150,3 +155,45 @@ def lemmatize(tweet):
     tweet = [nlp(c) for c in tweet]
     tweet = [" ".join([token.lemma_ for token in t]) for t in tweet]
     return tweet
+    
+def create_emotion_wordclouds(text):
+    clean_sentences = _preprocess_text(text)
+    emotion_dictionary = _create_emotion_dictionary(clean_sentences)
+    _plot_wordclouds(emotion_dictionary)
+
+def _preprocess_text(text):
+    clean_sentences = []
+    nlp = en_core_web_sm.load()
+    sentences = text.split('.')
+    for sentence in sentences: 
+        no_numbers = strip_numeric(sentence)
+        no_punctuation = strip_punctuation(no_numbers)
+        no_extra_whitespaces = strip_multiple_whitespaces(no_punctuation)
+        stripped = no_extra_whitespaces.strip()
+        lowercase = stripped.lower()
+        no_stopwords = remove_stopwords(lowercase)
+        no_short_words = strip_short(no_stopwords)
+        lemmatized = ' '.join([token.lemma_ for token in nlp(no_short_words)])
+        if len(lemmatized) > 0:
+            clean_sentences.append(lemmatized)
+    return clean_sentences
+
+def _create_emotion_dictionary(sentences):
+    emotion_dictionary = {}
+    for sentence in sentences:
+        text_object = NRCLex(sentence)
+        if len(text_object.affect_list) > 0:
+            top_emotion = text_object.top_emotions[0][0]
+            if top_emotion in emotion_dictionary:
+                emotion_dictionary[top_emotion] += ' {}'.format(sentence)
+            else:
+                emotion_dictionary[top_emotion] = sentence
+    return emotion_dictionary
+
+def _plot_wordclouds(emotion_dictionary):
+    for key, value in emotion_dictionary.items():
+        plt.figure()
+        plt.imshow(WordCloud(background_color='white', width=600, height=300).generate(value))
+        plt.axis("off")
+        plt.title(key)
+        plt.show()
