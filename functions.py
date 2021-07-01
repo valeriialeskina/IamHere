@@ -197,3 +197,41 @@ def _plot_wordclouds(emotion_dictionary):
         plt.axis("off")
         plt.title(key)
         plt.show()
+
+###
+### FUNCTIONS FOR ANALYZING ONE POST ###
+###
+
+
+#1. Split one post into sentences and return the dataframe
+def split_post(post):
+    post_str = post.split('.')
+    post_str = [sentence.strip() for sentence in post_str]
+    post_df = pd.DataFrame(post_str, columns=['sentence'])
+    return post_df
+
+#2. get emotion from string
+def get_NRC_emotions(text):
+    obj_NRC = NRCLex(text)
+    return obj_NRC.affect_frequencies
+
+#3 get keywords from string
+def get_NRC_keywords(text):
+    obj_NRC = NRCLex(text)
+    return obj_NRC.affect_dict
+
+#4 return a dataframe with emotions as columns, relative frequencies of emotions and keywords that were taken
+#into account for the emotion analysis
+def append_emotions(data):
+    data['NRClex'] = data.sentence.apply(get_NRC_emotions)
+    data['keywords'] = data.sentence.apply(get_NRC_keywords)
+    emotions = ['fear', 'anger', 'trust', 'surprise', 'positive', 'negative', 'sadness', 'disgust', 'joy','anticipation']
+    data[['fear', 'anger', 'trust', 'surprise', 'positive', 'negative', 'sadness', 'disgust', 'joy','anticipation']]=0
+    for emotion in emotions:
+        for i, name in data.NRClex.iteritems():
+            try:
+                data.loc[i,emotion] = name[emotion] 
+            except:
+                data.loc[i,emotion] = 0
+    return data
+
