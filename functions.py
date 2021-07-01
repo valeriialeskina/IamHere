@@ -18,10 +18,14 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.preprocessing import Binarizer
 from gensim.corpora import Dictionary
 from gensim.models import TfidfModel
-from nltk.tokenize import word_tokenize
+from nltk.tokenize import word_tokenize, sent_tokenize
+import operator
 
 nltk.download('punkt')
 import demoji
+demoji.download_codes()
+import text2emotion
+from nrclex import NRCLex
 demoji.download_codes()
 
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
@@ -234,4 +238,44 @@ def append_emotions(data):
             except:
                 data.loc[i,emotion] = 0
     return data
+
+def get_emotion_nrclx(text):
+    text_object = NRCLex(text)
+    emotion = max(text_object.top_emotions,key=operator.itemgetter(1))[0]
+    return emotion
+
+def extract_emotion_text2emotion(text):
+    emotion_probas = text2emotion.get_emotion(text)
+    emotion = max(emotion_probas.items(), key=operator.itemgetter(1))[0] #emotion with highest prob score
+    return emotion
+
+def clean_data(data):
+    data = strip_numeric(data)
+    data = strip_punctuation(data)
+    data = strip_multiple_whitespaces(data)
+    data = strip_short(data)
+    data = remove_stopwords(data)
+    data = data.lower()
+    return data
+
+def get_emotion_scores(text):
+    text_object = NRCLex(text)
+    emotion = max(text_object.top_emotions,key=operator.itemgetter(1))[0]
+    proba = max(text_object.top_emotions,key=operator.itemgetter(0))[1]
+    return emotion, proba
+
+def calcu1 (x):
+    text_object = NRCLex(x)
+    matches = text_object.affect_frequencies
+    return (matches)
+
+def get_top_sentences_emotions(series, emotion_segment):
+    series_text = ''.join(series)
+    text_to_string_emotion = series_text.replace('\n','')
+    sentences = sent_tokenize(text_to_string_emotion)
+    sentences_df = pd.DataFrame(sentences, columns=['sentences'])
+    sentences_df['emotion'] = sentences_df.sentences.apply(lambda x: get_emotion_scores(x)[0])
+    sentences_df['emotion_proba'] = sentences_df.sentences.apply(lambda x: get_emotion_scores(x)[1])
+    sent = sentences_df[sentences_df['emotion']==emotion_segment].sort_values(by='emotion_proba', ascending=False)['sentences'].head(3)
+    return sent
 
