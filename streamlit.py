@@ -14,7 +14,7 @@ strip_numeric, strip_punctuation, strip_multiple_whitespaces,
 remove_stopwords, strip_short, stem_text)
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud, STOPWORDS
-from functions import clean_data, get_emotion_nrclx, get_emotion_scores, calcu1, get_top_sentences_emotions
+from functions import clean_data, get_emotion_nrclx, get_emotion_scores, calcu1, get_top_sentences_emotions, _preprocess_text
 import datetime
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
@@ -56,6 +56,7 @@ col1, col2 = st.beta_columns((1,2))
 fig1 = px.bar(data_frame=df_subset_grouped, x = 'date', y = 'count', color = 'emotion', color_discrete_map= 
 {'positive':'steelblue', 'negative':'firebrick', 'anticipation':'orange', 'trust':'green',
 'fear':'purple'}, title = 'Bar Chart with dynamics of Emotions for Specified timescale')
+#fig1.update_yaxes(tickformat='d')
 fig2 = px.pie(data_frame=df_subset_grouped, names = 'emotion', color= 'emotion', color_discrete_map=
 {'positive':'steelblue', 'negative':'firebrick', 'anticipation':'orange', 'trust':'green',
 'fear':'purple'}, title = 'Pie Chart with frequency of emotions')
@@ -65,6 +66,7 @@ col1.plotly_chart(fig2, use_container_width=True)
 col2.plotly_chart(fig1, use_container_width=True)
 emotion = st.selectbox(label = 'Choose emotion to see most common words', options = list(df_subset.emotion.unique()))
 df_subset['full_text_clean'] = df_subset.full_text.apply(clean_data)
+#df_subset['full_text_clean'] = df_subset.full_text.apply(clean_data).apply(_preprocess_text)
 df_subset_emotions = df_subset.full_text_clean.loc[df_subset.emotion == emotion]
 df_subset_emotions_text = ''.join(df_subset_emotions)
 stopwords = set(STOPWORDS)
@@ -85,6 +87,8 @@ for i in sent[:3]:
 
 st.write('')
 st.write('')
+
+##entry-level filtering section
 entry_level = st.checkbox(label='Select this to go to the analysis of specific diary entry')
 if entry_level is True:
     entry_diary = st.selectbox(label='Choose the diary entry', options = list(df_subset.header.unique()))
@@ -112,7 +116,8 @@ if entry_level is True:
  
 st.write('')
 st.write('')
-if  st.checkbox("Get REAL-TIME emotions! Check this mark and try it out yourself!"):
+##visualisation of open-text provided by the user 
+if  st.checkbox("Get REAL-TIME analysis of your emotions! Check this mark and try it out yourself!"):
     abc = 'I am walking in the forest. I just saw a lion. I was scared and surprised. I was not sure what to do'
     message = st.text_area("Just write your thoughts", abc)
     if st.button("Submit"):
