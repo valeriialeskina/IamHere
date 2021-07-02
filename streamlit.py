@@ -9,16 +9,11 @@ import plotly.express as px
 import warnings
 warnings.filterwarnings("ignore",category=DeprecationWarning)
 st.set_option('deprecation.showPyplotGlobalUse', False)
-from gensim.parsing.preprocessing import (STOPWORDS, strip_tags,
-strip_numeric, strip_punctuation, strip_multiple_whitespaces,
-remove_stopwords, strip_short, stem_text)
+from gensim.parsing.preprocessing import STOPWORDS
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud, STOPWORDS
 from functions import clean_data, get_emotion_nrclx, get_emotion_scores, calcu1, get_top_sentences_emotions, _preprocess_text
 import datetime
-from plotly.subplots import make_subplots
-import plotly.graph_objects as go
-from nltk.tokenize import sent_tokenize
 
 #dataset (blog) filter for analysis of emotions
 blog = st.sidebar.selectbox(label = 'Select the Blog', options=['Diary Blog', 'Travel Blog', 'Depression Blog'])
