@@ -9,10 +9,10 @@ import plotly.express as px
 import warnings
 warnings.filterwarnings("ignore",category=DeprecationWarning)
 st.set_option('deprecation.showPyplotGlobalUse', False)
-from gensim.parsing.preprocessing import STOPWORDS
+from gensim.parsing.preprocessing import STOPWORDS, strip_punctuation, strip_short, strip_punctuation
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud, STOPWORDS
-from functions import clean_data, get_emotion_nrclx, get_emotion_scores, calcu1, get_top_sentences_emotions, _preprocess_text
+from functions import clean_data, get_emotion_nrclx, get_emotion_scores, calcu1, get_top_sentences_emotions, _preprocess_text, remove_special_characters
 import datetime
 
 #dataset (blog) filter for analysis of emotions
@@ -60,7 +60,7 @@ fig2 = px.pie(data_frame=df_subset_grouped, names = 'emotion', color= 'emotion',
 col1.plotly_chart(fig2, use_container_width=True)
 col2.plotly_chart(fig1, use_container_width=True)
 emotion = st.selectbox(label = 'Choose emotion to see most common words', options = list(df_subset.emotion.unique()))
-df_subset['full_text_clean'] = df_subset.full_text.apply(clean_data)
+df_subset['full_text_clean'] = df_subset.full_text.apply(clean_data).apply(remove_special_characters)
 #df_subset['full_text_clean'] = df_subset.full_text.apply(clean_data).apply(_preprocess_text)
 df_subset_emotions = df_subset.full_text_clean.loc[df_subset.emotion == emotion]
 df_subset_emotions_text = ''.join(df_subset_emotions)
