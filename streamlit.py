@@ -111,9 +111,9 @@ if entry_level is True:
  
 st.write('')
 st.write('')
-##visualisation of open-text provided by the user 
-if  st.checkbox("Get REAL-TIME analysis of your emotions! Check this mark and try it out yourself!"):
-    abc = 'I am walking in the forest. I just saw a lion. I was scared and surprised. I was not sure what to do'
+if  st.checkbox("Get REAL-TIME emotions! Check this mark and try it out yourself!"):
+    
+    abc = df_subset['full_text'].iloc[0][:500]
     message = st.text_area("Just write your thoughts", abc)
     if st.button("Submit"):
          col1,col2 =st.beta_columns(2)
