@@ -11,6 +11,9 @@ import spacy # import en_core_web_sm
 import nltk
 nltk.download('stopwords')
 nltk.download('vader_lexicon')
+import streamlit as st
+import re
+from collections import Counter
 
 import os
 
@@ -149,6 +152,7 @@ def clean_vader(tweet): #to be adjusted for the diary -- for now it is copypaste
     tweet = [strip_multiple_whitespaces(c) for c in tweet]
     return tweet
 
+@st.cache
 def lemmatize(tweet):
     '''
     tweet: pandas series
@@ -165,6 +169,7 @@ def create_emotion_wordclouds(text):
     emotion_dictionary = _create_emotion_dictionary(clean_sentences)
     _plot_wordclouds(emotion_dictionary)
 
+@st.cache
 def _preprocess_text(text):
     clean_sentences = []
     nlp = en_core_web_sm.load()
@@ -180,7 +185,7 @@ def _preprocess_text(text):
         lemmatized = ' '.join([token.lemma_ for token in nlp(no_short_words)])
         if len(lemmatized) > 0:
             clean_sentences.append(lemmatized)
-    return clean_sentences
+    return ''.join(clean_sentences)
 
 def _create_emotion_dictionary(sentences):
     emotion_dictionary = {}
@@ -249,6 +254,7 @@ def extract_emotion_text2emotion(text):
     emotion = max(emotion_probas.items(), key=operator.itemgetter(1))[0] #emotion with highest prob score
     return emotion
 
+@st.cache
 def clean_data(data):
     data = strip_numeric(data)
     data = strip_punctuation(data)
@@ -264,10 +270,17 @@ def get_emotion_scores(text):
     proba = max(text_object.top_emotions,key=operator.itemgetter(0))[1]
     return emotion, proba
 
-def calcu1 (x):
+def get_emotion_freqs (x):
     text_object = NRCLex(x)
     matches = text_object.affect_frequencies
-    return (matches)
+    return {i:matches[i] for i in matches if i!='anticip'}
+
+def get_top3_emotion_freqs (x):
+    text_object = NRCLex(x)
+    matches = text_object.affect_frequencies
+    #return {i:matches[i] for i in matches if i!='anticip'}
+    cnt = Counter(matches)
+    return dict(cnt.most_common(3))
 
 def get_top_sentences_emotions(series, emotion_segment):
     series_text = ''.join(series)
@@ -278,4 +291,8 @@ def get_top_sentences_emotions(series, emotion_segment):
     sentences_df['emotion_proba'] = sentences_df.sentences.apply(lambda x: get_emotion_scores(x)[1])
     sent = sentences_df[sentences_df['emotion']==emotion_segment].sort_values(by='emotion_proba', ascending=False)['sentences'].head(3)
     return sent
+
+def remove_special_characters(text):
+    text = re.sub('[“”‘’¡¿]', '', text, flags=re.IGNORECASE)
+    return text
 
