@@ -28,7 +28,7 @@ Enjoy :)
 #dataset (blog) filter for analysis of emotions
 blog = st.sidebar.selectbox(label = 'Select the Blog', options=['Diary Blog', 'Travel Blog', 'Depression Blog'])
 
-@st.cache(suppress_st_warning=True)
+@st.cache(suppress_st_warning=True, allow_output_mutation=True)
 def load_data(blog):
     if blog == 'Depression Blog':
         df = pickle.load(open('data/depression_marathon_df_final.pkl', 'rb'))
@@ -40,7 +40,7 @@ def load_data(blog):
     return df
 df = load_data(blog)
 
-@st.cache(suppress_st_warning=True)
+@st.cache(suppress_st_warning=True, allow_output_mutation=True)
 def min_max_dates(df):
     return df.date.min(),df.date.max()
 min,max = min_max_dates(df)
@@ -57,7 +57,7 @@ if period_start > period_end:
     #st.success('Start date: `%s`\n\nEnd date: `%s`' % (period_start, period_end))
 tab = st.sidebar.radio(label = '',options = ('The whole blog', 'A specific post', 'Try out your own text'))
 
-@st.cache(suppress_st_warning=True)
+@st.cache(suppress_st_warning=True, allow_output_mutation=True)
 def get_data():
     df_subset = df.loc[(df['date'].dt.date >= period_start) & (df['date'].dt.date < period_end)] #subsetting the data based on user-defined ranges
     df_subset['full_text_clean'] = df_subset.full_text.apply(clean_data).apply(remove_special_characters)
@@ -78,7 +78,7 @@ if tab == 'The whole blog':
     #st.write(df_emotion_freq)
     #st.write(df_subset_grouped)
 
-    @st.cache(suppress_st_warning=True)
+    @st.cache(suppress_st_warning=True, allow_output_mutation=True)
     def blog_charts():
         #col1, col2 = st.beta_columns((1,2))
         fig1 = px.bar(data_frame=df_subset_grouped, x = 'date', y = df_emotion_freq.columns[df_emotion_freq.columns != 'date'], barmode='group', color_discrete_map= {'positive':'green', 'negative':'red', 'anticipation':'orange', 'trust':'steelblue', 'fear':'purple', 'anger':'indigo', 'surprise': "magenta", 'disgust':'black', 'sadness':'pink', 'joy':'silver'}, title = 'Bar Chart with relative freqency of Emotions for specified time period')
@@ -103,7 +103,7 @@ if tab == 'The whole blog':
     st.subheader("**_Check Wordcloud showing the most frequent words in the diary entries for the specified time period._**")
     emotion = st.selectbox(label = 'Choose emotion', options = list(df_subset.emotion.unique()))
     
-    @st.cache(suppress_st_warning=True)
+    @st.cache(suppress_st_warning=True, allow_output_mutation=True)
     def blog_wordcloud():
         #df_subset['full_text_clean'] = df_subset.full_text.apply(clean_data).apply(_preprocess_text)
         df_subset_emotions = df_subset.full_text_clean.loc[df_subset.emotion == emotion]
@@ -119,7 +119,7 @@ if tab == 'The whole blog':
     st.pyplot()
     
 
-    @st.cache(suppress_st_warning=True)
+    @st.cache(suppress_st_warning=True, allow_output_mutation=True)
     def top3_sentences():
         df_subset_emotion = df_subset.loc[df_subset.emotion == emotion]
         sent = get_top_sentences_emotions(df_subset_emotion.full_text, emotion_segment=emotion)
@@ -153,7 +153,7 @@ elif tab == 'A specific post':
     
     st.subheader('Pie Chart with relative frequency of Emotions in the selected diary entry')
     
-    @st.cache(suppress_st_warning=True)
+    @st.cache(suppress_st_warning=True, allow_output_mutation=True)
     def post_charts():
         emoji_freq = get_emotion_freqs(df_entry.iloc[0])
         emoji_freq_items = emoji_freq.items()
@@ -170,7 +170,7 @@ elif tab == 'A specific post':
     
     st.subheader('Top words used in the selected diary entry')
     
-    @st.cache(suppress_st_warning=True)
+    @st.cache(suppress_st_warning=True, allow_output_mutation=True)
     def post_wordcloud():
         df_entry_clean = clean_data(df_entry.iloc[0])
         df_entry_clean = remove_special_characters(df_entry_clean)
@@ -220,3 +220,4 @@ elif  tab == 'Try out your own text':
             plt.imshow(wordcloud2)
             plt.axis("off")
             st.pyplot()
+
