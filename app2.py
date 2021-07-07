@@ -52,8 +52,8 @@ df_emotion_freq['date'] = df_subset['date'].values
 df_subset_grouped = df_emotion_freq.groupby([pd.Grouper(key='date', freq='7D')]).mean().reset_index()
 st.write("Number of entries across the specified period:", len(df_subset))
 table = st.write(df_subset[['header','date', 'full_text', 'emotion']])
-#st.write(df_emotion_freq)
-#st.write(df_subset_grouped)
+st.write(df_emotion_freq)
+st.write(df_subset_grouped)
 
 
 col1, col2 = st.beta_columns((1,2))
@@ -64,6 +64,7 @@ fig1 = px.bar(data_frame=df_subset_grouped, x = 'date', y = df_emotion_freq.colu
 fig1.update_yaxes(title = 'Relative frequency', tickformat = ',.0%')
 fig1.update_xaxes(title = 'weeks')
 agg_avg_emotion_freq = df_subset_grouped.mean()
+
 agg_sum_emotion_freq = agg_avg_emotion_freq.sum()
 agg_rel_freq_emotion = agg_avg_emotion_freq/agg_sum_emotion_freq
 fig2 = px.pie(names=agg_rel_freq_emotion.index, values=agg_rel_freq_emotion, color = agg_rel_freq_emotion.index, color_discrete_map={'positive':'green', 'negative':'red', 'anticipation':'orange', 'trust':'steelblue', 'fear':'purple', 'anger':'indigo', 'surprise': "magenta", 'disgust':'black', 'sadness':'pink', 'joy':'silver'}, title = 'Pie Chart with relative frequency of Emotions')
@@ -72,8 +73,8 @@ fig2 = px.pie(names=agg_rel_freq_emotion.index, values=agg_rel_freq_emotion, col
 # 'fear':'purple'}, title = 'Pie Chart with frequency of emotions')
 
 
-col1.plotly_chart(fig2, use_container_width=True)
-col2.plotly_chart(fig1, use_container_width=True)
+st.plotly_chart(fig2, use_container_width=True)
+st.plotly_chart(fig1, use_container_width=True)
 st.subheader("**_Check Wordcloud showing the most frequent words in the diary entries for the specified time period._**")
 emotion = st.selectbox(label = 'Choose emotion to see most common words', options = list(df_subset.emotion.unique()))
 df_subset['full_text_clean'] = df_subset.full_text.apply(clean_data).apply(remove_special_characters)
