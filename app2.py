@@ -9,6 +9,7 @@ import plotly.express as px
 import warnings
 warnings.filterwarnings("ignore",category=DeprecationWarning)
 st.set_option('deprecation.showPyplotGlobalUse', False)
+st.set_page_config(layout='wide')
 from gensim.parsing.preprocessing import STOPWORDS, strip_punctuation, strip_short, strip_punctuation
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud, STOPWORDS
@@ -30,7 +31,7 @@ df['emotion'] = df.full_text.apply(get_emotion_nrclx) #getting emotions from nrc
 st.title("IamHere Dashboard")
 st.header("IamHere to show how emotions could be derived from blogposts. On the left sidebar choose one blog and a period. Further on the page you will see insightful graphs and cloud of words for the overall blog and for a chosen blogpost.")
 period_start = st.sidebar.date_input('Choose the start date for entries', value=datetime.date(2021,3,1), min_value=df.date.min(), max_value=df.date.max())
-period_end = st.sidebar.date_input('Choose the end date for entries', min_value=df.date.min(), max_value=df.date.max())
+period_end = st.sidebar.date_input('Choose the end date for entries', min_value=df.date.min())
 st.sidebar.write("")
 st.sidebar.write("")
 st.sidebar.write("")
@@ -52,8 +53,6 @@ df_emotion_freq['date'] = df_subset['date'].values
 df_subset_grouped = df_emotion_freq.groupby([pd.Grouper(key='date', freq='7D')]).mean().reset_index()
 st.write("Number of entries across the specified period:", len(df_subset))
 table = st.write(df_subset[['header','date', 'full_text', 'emotion']])
-st.write(df_emotion_freq)
-st.write(df_subset_grouped)
 
 
 col1, col2 = st.beta_columns((1,2))
@@ -82,8 +81,7 @@ df_subset['full_text_clean'] = df_subset.full_text.apply(clean_data).apply(remov
 df_subset_emotions = df_subset.full_text_clean.loc[df_subset.emotion == emotion]
 df_subset_emotions_text = ''.join(df_subset_emotions)
 stopwords = set(STOPWORDS)
-#plt.figure(figsize=(10,8))
-wordcloud = WordCloud(stopwords=stopwords, background_color="white").generate(df_subset_emotions_text)
+wordcloud = WordCloud(stopwords=stopwords, background_color="white", width=800, height=400).generate(df_subset_emotions_text)
 plt.imshow(wordcloud)
 plt.axis("off")
 plt.show()
@@ -130,7 +128,7 @@ st.plotly_chart(fig3,use_container_width=True)
 st.subheader('Top words used in the selected diary entry')
 df_entry_clean = clean_data(df_entry.iloc[0])
 df_entry_clean = remove_special_characters(df_entry_clean)
-wordcloud = WordCloud(stopwords=stopwords, background_color="white").generate(df_entry_clean)
+wordcloud = WordCloud(stopwords=stopwords, background_color="white", width=800, height=400).generate(df_entry_clean)
 st.set_option('deprecation.showPyplotGlobalUse', False)
 plt.imshow(wordcloud)
 plt.axis("off")
@@ -161,7 +159,7 @@ if  st.checkbox("Get REAL-TIME analysis of your thoughts! Check this mark and tr
            st.plotly_chart(fig,use_container_width=True)
          with col2:
            st.subheader('Top words used in the text')
-           wordcloud2 = WordCloud(background_color='white',width=400, height=200).generate(message)
+           wordcloud2 = WordCloud(background_color='white', width=800, height=400).generate(message)
            st.set_option('deprecation.showPyplotGlobalUse', False)
            plt.imshow(wordcloud2)
            plt.axis("off")
