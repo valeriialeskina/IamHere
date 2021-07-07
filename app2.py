@@ -199,23 +199,23 @@ elif  tab == 'Try out your own text':
     It was not that easy, to be honest. We must admit, there is a lot of stuff to improve. 
     That`s why we need your support to improve what we already have
     """
-    message = st.text_area("Just write your thoughts", abc)
-    if st.button("Submit"):
-         #col1,col2 =st.beta_columns(2)
-         #with col1:
-        st.subheader('Emotions in your entry')
-        blob = get_emotion_freqs(message)
-        data_items = blob.items()
-        data_list = list(data_items)
-        df = pd.DataFrame(data_list,columns = ['Emotion','value'])
-        df1= df[df['value'] != 0]
-        a_list = df1['Emotion'].tolist()
-        fig = px.pie(df1, values= df1.value,names= a_list, color = a_list, color_discrete_map={'positive':'green', 'negative':'red', 'anticipation':'orange', 'trust':'steelblue', 'fear':'purple', 'anger':'indigo', 'surprise': "magenta", 'disgust':'black', 'sadness':'pink', 'joy':'silver'})
-        st.plotly_chart(fig,use_container_width=True)
-        # with col2:
-        st.subheader('Top words used in the text')
-        wordcloud2 = WordCloud(background_color='white',width=400, height=200).generate(message)
-        st.set_option('deprecation.showPyplotGlobalUse', False)
-        plt.imshow(wordcloud2)
-        plt.axis("off")
-        st.pyplot()
+    message = st.text_area("Just write your text", abc)
+    if st.button("Try"):
+        col1,col2 =st.beta_columns(2)
+        with col1:
+            st.subheader('Emotions in your entry')
+            blob = get_emotion_freqs(message)
+            data_items = blob.items()
+            data_list = list(data_items)
+            df = pd.DataFrame(data_list,columns = ['Emotion','value'])
+            df1= df[df['value'] != 0]
+            a_list = df1['Emotion'].tolist()
+            fig = px.pie(df1, values= df1.value,names= a_list, color = a_list, color_discrete_map={'positive':'green', 'negative':'red', 'anticipation':'orange', 'trust':'steelblue', 'fear':'purple', 'anger':'indigo', 'surprise': "magenta", 'disgust':'black', 'sadness':'pink', 'joy':'silver'})
+            st.plotly_chart(fig,use_container_width=True)
+        with col2:
+            st.subheader('Top words used in the text')
+            wordcloud2 = WordCloud(background_color='white',width=400, height=200).generate(message)
+            st.set_option('deprecation.showPyplotGlobalUse', False)
+            plt.imshow(wordcloud2)
+            plt.axis("off")
+            st.pyplot()
