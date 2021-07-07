@@ -9,6 +9,7 @@ import plotly.express as px
 import warnings
 warnings.filterwarnings("ignore",category=DeprecationWarning)
 st.set_option('deprecation.showPyplotGlobalUse', False)
+st.set_page_config(layout='wide')
 from gensim.parsing.preprocessing import STOPWORDS, strip_punctuation, strip_short, strip_punctuation
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud, STOPWORDS
