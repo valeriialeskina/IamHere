@@ -17,7 +17,12 @@ import datetime
 from nltk import sent_tokenize
 stopwords = set(STOPWORDS)
 
-st.sidebar.header("IamHere to show how emotions could be derived from blogposts. On the left sidebar choose one blog and a period. Further on the page you will see insightful graphs and cloud of words for the overall blog and for a chosen blogpost.")
+st.sidebar.header("""
+IamHere to show how emotions could be derived from diaries/private journals. 
+Choose one blog, period, and a level of analysis.
+And do not hesitate to try out your own text.
+Enjoy :) 
+""")
 
 #dataset (blog) filter for analysis of emotions
 blog = st.sidebar.selectbox(label = 'Select the Blog', options=['Diary Blog', 'Travel Blog', 'Depression Blog'])
